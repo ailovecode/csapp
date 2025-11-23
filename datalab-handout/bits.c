@@ -168,8 +168,8 @@ int isTmax(int x)
   // 补码最大值 ~(1 << 31)
   // 如果是 则返回 1
   // 如果不是 则返回 0
-  // XIAOYU
-  return 0;
+  x = ~x;
+  return !(x ^ (~x + 1)) & (!!x);
 }
 /*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
