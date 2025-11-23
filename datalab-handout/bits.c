@@ -168,7 +168,7 @@ int isTmax(int x)
   // 补码最大值 ~(1 << 31)
   // 如果是 则返回 1
   // 如果不是 则返回 0
-  return !((x << 1) + 2);
+  return 0;
 }
 /*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
