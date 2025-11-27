@@ -205,7 +205,8 @@ int allOddBits(int x)
  */
 int negate(int x)
 {
-  return 2;
+  // 补码相反数规则：取反 + 1 ; Tmin 和 0 的相反数都是本身
+  return (~x + 1);
 }
 // 3
 /*
