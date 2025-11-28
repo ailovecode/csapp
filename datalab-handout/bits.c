@@ -241,10 +241,23 @@ int isAsciiDigit(int x)
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
  *   Rating: 3
+ * 要解决的问题：
+ * 1. 判断 x 是否为 0？
+ * 答：通过 !! 符号来执行，非 0 的数最后会转换成 1；
+ * 2. 构建 0xffffffff？
+ * 答：可以发现 0xffffffff 是-1，1 的相反数，则直接取反+1即可；
+ *
+ * 这个问题首先要想到如何同时计算 y 和 z，并且只能保留一个，则想到与 -1 进行 & 运算，不保留的那一个同 0 执行 &；
+ * 倒推y 和 z 在什么时候跟谁进行 &，根据 x 的值来判断；
+ * 这里做一个转化，如果 x 不等于 0，则将其转换为 1；
+ * 而当 x == 1，则需要输出 y，那么 y 需要同 -1 进行 & 运算；
+ * 最终进行条件拼接判断则可以得出结果。
  */
 int conditional(int x, int y, int z)
 {
-  return 2;
+  int t = !!x;
+  t = ~t + 1;
+  return (t & y) | ((~t) & z);
 }
 /*
  * isLessOrEqual - if x <= y  then return 1, else return 0
