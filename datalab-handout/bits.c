@@ -233,7 +233,7 @@ int isAsciiDigit(int x)
    */
   int y = 0x39;
   y = (x + (~y + 1));
-  return !((x >> 4) ^ 0x03) && (!((y >> 7) + 1) || (!y));
+  return !((x >> 4) ^ 0x03) & (!((y >> 7) + 1) | (!y));
 }
 /*
  * conditional - same as x ? y : z
@@ -359,10 +359,30 @@ int howManyBits(int x)
  *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
  *   Max ops: 30
  *   Rating: 4
+ *
+ * 解题思路：
+ * 首先要了解 IEEE 754 的规则标准，分为3部分，s - exp - frac
+ * 然后根据参数将这三部分分别取出（可以根据自己情况去获取，可以只获取目标区间的值，其余位为 0 ，这样方便在最后去相加）
+ * 结果可分为 3 种情况：exp == 0 | exp 全为 1 | exp 在计算之后全为 1 | 正常情况
+ * 1. 直接将 frac 乘 2 即可；
+ * 2. 返回参数；
+ * 3. 此时需要返回 无穷大，从课中可以了解到 当 exp全为1，frac 全为0 的浮点数表示方式为 无穷大，这里要注意保留符号位；
+ * 4. 正常情况将 exp + 1 即可，然后将所分离的3部分相加就是最终结果；
  */
 unsigned floatScale2(unsigned uf)
 {
-  return 2;
+  unsigned s = uf & (1 << 31);
+  unsigned exp = uf & 0x7f800000;
+  unsigned frac = uf & 0x007fffff;
+
+  if (exp == 0x7f800000)
+    return uf;
+  if (exp == 0)
+    return frac << 1 | s;
+  exp += 0x00800000;
+  if (exp == 0x7f800000)
+    return 0x7f800000 | s;
+  return s | exp | frac;
 }
 /*
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
@@ -375,10 +395,39 @@ unsigned floatScale2(unsigned uf)
  *   Legal ops: Any integer/unsigned operations incl. ||, &&. also if, while
  *   Max ops: 30
  *   Rating: 4
+ *
+ * 浮点数强转为整型
+ *
+ * 解题思路：
+ *     同样这个题也需要分为几种情况：
+ * 1. exp 全为 1 || 指数超出 int 范围 31, 这种情况都是根据题目要求输出 0x80000000u
+ * 2. 计算的实际指数 < 0, 那么实际的值是只有小数部分直接舍去返回 0;
+ * 3. 正常处理，分为两部分指数如果 大于 23并且小于31，则需要在尾数后面补充 0; 如果小于23 就去e位尾数部分即可；反正就是从尾数中获取 e 位，不够则用 0 来补；
+ *
+ * 注意点，当在正常处理的时候尾数前面是需要添加 1 的。
  */
 int floatFloat2Int(unsigned uf)
 {
-  return 2;
+  unsigned s = uf & (1 << 31);
+  int exp = (uf & 0x7f800000) >> 23;
+  unsigned frac = uf & 0x007fffff;
+  int flag = 1;
+  int e = exp - 127;
+
+  if (exp == 255 || e > 31)
+    return 0x80000000u;
+
+  if (e < 0)
+    return 0;
+
+  frac = frac | (1 << 23);
+
+  if (s == 0x80000000)
+    flag = -1;
+  if (e > 23)
+    return (frac << (e - 23)) * flag;
+
+  return (frac >> (23 - e)) * flag;
 }
 /*
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
@@ -392,8 +441,18 @@ int floatFloat2Int(unsigned uf)
  *   Legal ops: Any integer/unsigned operations incl. ||, &&. Also if, while
  *   Max ops: 30
  *   Rating: 4
+ * 整型强转成单精度浮点类型
+ * 正常来说，指数区域所能够表示的指数范围在[-127, 128], 但是由于尾数同样是可以表示数据的，因此最小的范围又延伸 22 位，即[-149, 128]
+ * 由于IEEE 754 的表示方式分为 规格化表示 和 非规格化表示，当 exp 为 0 的时候是非规格化，其指数计算方式是 1 - bias；
+ * 因此当 x 的范围在 [-127, -149] 时，我们通过非规格化来表示，只计算尾数即可
  */
 unsigned floatPower2(int x)
 {
-  return 2;
+  if (x >= 128)
+    return 0x7f800000u;
+  if (x >= -126)
+    return (x + 127) << 23;
+  if (x >= -149)
+    return 1 << (x + 149);
+  return 0;
 }
