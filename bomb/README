@@ -15,6 +15,13 @@ This is an x86-64 bomb for self-study students.
 4. strings 将显示炸弹中的可打印字符串
 5. man ascii 可以查看所有 ascii 信息
 6. info gas 了解GNU汇编器的方方面面
+7. layout asm  gdb中进入反汇编模式
+8. layout regs  gdb中显示寄存器和反汇编窗口
 
 带来的好处：
 1. 将会熟练掌握使用调试器
+
+拆弹进度：
+1. 已完成
+2. 首先至少需要 6 个数字，最终可以判断六个数字组成一个公比为2 首项为1 的等比数列
+

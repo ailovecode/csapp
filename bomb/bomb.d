@@ -338,7 +338,7 @@ Disassembly of section .text:
   400ed9:	90                   	nop
   400eda:	90                   	nop
   400edb:	90                   	nop
-  400edc:	90                   	nop
+  400edc:	90                   	nop*
   400edd:	90                   	nop
   400ede:	90                   	nop
   400edf:	90                   	nop
