@@ -17,6 +17,9 @@ This is an x86-64 bomb for self-study students.
 6. info gas 了解GNU汇编器的方方面面
 7. layout asm  gdb中进入反汇编模式
 8. layout regs  gdb中显示寄存器和反汇编窗口
+9. stepi 执行下一步操作
+10. continue 继续执行直到断点或者结束
+11. Ctrl + l 能够清屏（gdb 模式下）
 
 带来的好处：
 1. 将会熟练掌握使用调试器
